@@ -86,14 +86,15 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   write8(BNO055_PAGE_ID_ADDR, 0);
 
   /* Set the output units */
-  /*
-  uint8_t unitsel = (0 << 7) | // Orientation = Android
-                    (0 << 4) | // Temperature = Celsius
-                    (0 << 2) | // Euler = Degrees
-                    (1 << 1) | // Gyro = Rads
-                    (0 << 0);  // Accelerometer = m/s^2
-  write8(BNO055_UNIT_SEL_ADDR, unitsel);
-  */
+  // Defaultvalues as after reset of sensorchip
+  setUnits(
+      // UNIT_ORIENT_WINDOWS |
+      // UNIT_TEMP_FAHRENHEIT  |
+      // UNIT_EULER_RADS |
+      // UNIT_GYRO_RADS     |
+      // UNIT_ACCEL_MILLIG
+      0);
+
 
   write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
   delay(10);
@@ -115,6 +116,22 @@ void Adafruit_BNO055::setMode(adafruit_bno055_opmode_t mode)
   write8(BNO055_OPR_MODE_ADDR, _mode);
   delay(30);
 }
+
+
+/**************************************************************************/
+/*!
+    @brief  set the requested units for the device
+*/
+/**************************************************************************/
+void Adafruit_BNO055::setUnits(uint8_t unitsel)
+{
+  adafruit_bno055_opmode_t modeback = _mode;
+  _units = unitsel;
+  setMode(OPERATION_MODE_CONFIG);
+  write8(BNO055_UNIT_SEL_ADDR, unitsel);
+  setMode(modeback);
+}
+
 
 /**************************************************************************/
 /*!
@@ -264,6 +281,8 @@ void Adafruit_BNO055::getCalibration(uint8_t* sys, uint8_t* gyro, uint8_t* accel
 int8_t Adafruit_BNO055::getTemp(void)
 {
   int8_t temp = (int8_t)(read8(BNO055_TEMP_ADDR));
+  if (UNIT_TEMP_FAHRENHEIT & _units)
+    temp *= 2;
   return temp;
 }
 
@@ -288,37 +307,58 @@ imu::Vector<3> Adafruit_BNO055::getVector(adafruit_vector_type_t vector_type)
   y = ((int16_t)buffer[2]) | (((int16_t)buffer[3]) << 8);
   z = ((int16_t)buffer[4]) | (((int16_t)buffer[5]) << 8);
 
+  double divider;
   /* Convert the value to an appropriate range (section 3.6.4) */
   /* and assign the value to the Vector type */
   switch(vector_type)
   {
     case VECTOR_MAGNETOMETER:
       /* 1uT = 16 LSB */
-      xyz[0] = ((double)x)/16.0;
-      xyz[1] = ((double)y)/16.0;
-      xyz[2] = ((double)z)/16.0;
+      divider = 16.0;
       break;
     case VECTOR_GYROSCOPE:
-      /* 1rps = 900 LSB */
-      xyz[0] = ((double)x)/900.0;
-      xyz[1] = ((double)y)/900.0;
-      xyz[2] = ((double)z)/900.0;
+      if (UNIT_GYRO_RADS & _units)
+      {
+        /* 1rps = 900 LSB */
+        divider = 900.0;
+      }
+      else
+      {
+        /* 1dps = 16 LSB */
+        divider = 16.0;
+      }
       break;
     case VECTOR_EULER:
-      /* 1 degree = 16 LSB */
-      xyz[0] = ((double)x)/16.0;
-      xyz[1] = ((double)y)/16.0;
-      xyz[2] = ((double)z)/16.0;
+      if (UNIT_EULER_RADS & _units)
+      {
+        /* 1 rad = 900 LSB */
+        divider = 900.0;
+      }
+      else
+      {
+        /* 1 degree = 16 LSB */
+        divider = 16.0;
+      }
       break;
     case VECTOR_ACCELEROMETER:
     case VECTOR_LINEARACCEL:
     case VECTOR_GRAVITY:
-      /* 1m/s^2 = 100 LSB */
-      xyz[0] = ((double)x)/100.0;
-      xyz[1] = ((double)y)/100.0;
-      xyz[2] = ((double)z)/100.0;
+      if (UNIT_ACCEL_MILLIG & _units)
+      {
+        /* 1mg = 1 LSB */
+        divider = 1.0;
+      }
+      else
+      {
+        /* 1m/s^2 = 100 LSB */
+        divider = 100.0;
+      }
       break;
   }
+
+  xyz[0] = ((double)x)/divider;
+  xyz[1] = ((double)y)/divider;
+  xyz[2] = ((double)z)/divider;
 
   return xyz;
 }

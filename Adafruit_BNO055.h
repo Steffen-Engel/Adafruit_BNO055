@@ -218,6 +218,17 @@ class Adafruit_BNO055 : public Adafruit_Sensor
       OPERATION_MODE_NDOF                                     = 0X0C
     } adafruit_bno055_opmode_t;
 
+
+    typedef enum
+    {
+      UNIT_ORIENT_WINDOWS                                     = (1<<7),
+      UNIT_TEMP_FAHRENHEIT                                    = (1<<4),
+      UNIT_EULER_RADS                                         = (1<<2),
+      UNIT_GYRO_RADS                                          = (1<<1),
+      UNIT_ACCEL_MILLIG                                       = (1<<0)
+    } adafruit_bno055_unitsel_t;
+
+
     typedef struct
     {
       uint8_t  accel_rev;
@@ -241,6 +252,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor
 
     bool  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
+    void  setUnits            ( uint8_t unitsel );
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
     void  setExtCrystalUse    ( boolean usextal );
@@ -266,6 +278,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor
     uint8_t _address;
     int32_t _sensorID;
     adafruit_bno055_opmode_t _mode;
+    uint8_t _units;
 };
 
 #endif
