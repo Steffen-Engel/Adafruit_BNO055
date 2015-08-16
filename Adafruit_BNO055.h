@@ -208,8 +208,57 @@ class Adafruit_BNO055 : public Adafruit_Sensor
       ACCEL_RADIUS_LSB_ADDR                                   = 0X67,
       ACCEL_RADIUS_MSB_ADDR                                   = 0X68,
       MAG_RADIUS_LSB_ADDR                                     = 0X69,
-      MAG_RADIUS_MSB_ADDR                                     = 0X6A
+      MAG_RADIUS_MSB_ADDR                                     = 0X6A,
+
+
+      /* Page 1 id register definition */
+      PAGE1_ID_ADDR                                           = 0X07,
+      ACC_CONFIG_ADDR                                         = 0X08,
+      MAG_CONFIG_ADDR                                         = 0X09,
+      GYR_CONFIG0_ADDR                                        = 0X0A,
+      GYR_CONFIG1_ADDR                                        = 0X0B,
+      ACC_SLEEP_CONFIG_ADDR                                   = 0X0C,
+      GYR_SLEEP_CONFIG_ADDR                                   = 0X0D,
+      INT_MSK_ADDR                                            = 0X0F,
+      INT_EN_ADDR                                             = 0X10,
+      ACC_AM_THRES_ADDR                                       = 0X11,
+      ACC_INT_SETTINGS_ADDR                                   = 0X12,
+      ACC_HG_DURATION_ADDR                                    = 0X13,
+      ACC_HG_THRES_ADDR                                       = 0X14,
+      NM_THRES_ADDR                                           = 0X15,
+      NM_SET_ADDR                                             = 0X16,
+      GYR_INT_SETTING_ADDR                                    = 0X17,
+      GYR_HR_X_SET_ADDR                                       = 0X18,
+      GYR_DUR_X_ADDR                                          = 0X19,
+      GYR_HR_Y_SET_ADDR                                       = 0X1A,
+      GYR_DUR_Y_ADDR                                          = 0X1B,
+      GYR_HR_Z_SET_ADDR                                       = 0X1C,
+      GYR_DUR_Z_ADDR                                          = 0X1D,
+      BGYR_AM_THRES_ADDR                                      = 0X1E,
+      GYR_AM_SET_ADDR                                         = 0X1F
     } adafruit_bno055_reg_t;
+
+    typedef enum
+    {
+      ACC_CONFIG_2G                                           = 0X00,
+      ACC_CONFIG_4G                                           = 0X01,  /* default */
+      ACC_CONFIG_8G                                           = 0X02,
+      ACC_CONFIG_16G                                          = 0X03,
+      ACC_CONFIG_7_81HZ                                       = 0x00,
+      ACC_CONFIG_15_63HZ                                      = 0x04,
+      ACC_CONFIG_31_25HZ                                      = 0x08,
+      ACC_CONFIG_62_5HZ                                       = 0x0C,  /* default */
+      ACC_CONFIG_125HZ                                        = 0x10,
+      ACC_CONFIG_250HZ                                        = 0x14,
+      ACC_CONFIG_500HZ                                        = 0x18,
+      ACC_CONFIG_1000HZ                                       = 0x1C,
+      ACC_CONFIG_NORMAL                                       = 0x00,  /* default */
+      ACC_CONFIG_SUSPEND                                      = 0x20,
+      ACC_CONFIG_LOWPOWER1                                    = 0x40,
+      ACC_CONFIG_STANDBY                                      = 0x60,
+      ACC_CONFIG_LOWPOWER2                                    = 0x80,
+      ACC_CONFIG_DEEPSUSPEND                                  = 0xA0,
+    } adafruit_bno055_accmode_t;
 
     typedef enum
     {
@@ -298,6 +347,7 @@ class Adafruit_BNO055 : public Adafruit_Sensor
     bool  begin               ( adafruit_bno055_opmode_t mode = OPERATION_MODE_NDOF );
     void  setMode             ( adafruit_bno055_opmode_t mode );
     void  setUnits            ( uint8_t unitsel );
+    void  setAccConfig        ( uint8_t config);
     void  getRevInfo          ( adafruit_bno055_rev_info_t* );
     void  displayRevInfo      ( void );
     void  setExtCrystalUse    ( boolean usextal );

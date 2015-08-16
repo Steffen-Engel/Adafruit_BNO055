@@ -148,6 +148,21 @@ void Adafruit_BNO055::setUnits(uint8_t unitsel)
 
 /**************************************************************************/
 /*!
+    @brief  set acceleration resolution
+*/
+void Adafruit_BNO055::setAccConfig(uint8_t config)
+{
+  adafruit_bno055_opmode_t modeback = _mode;
+  setMode(OPERATION_MODE_CONFIG);
+  write8(BNO055_PAGE_ID_ADDR, 1);
+  write8(ACC_CONFIG_ADDR, (byte)config);
+  write8(PAGE1_ID_ADDR, 0);
+  setMode(modeback);
+}
+
+
+/**************************************************************************/
+/*!
     @brief  Use the external 32.768KHz crystal
 */
 /**************************************************************************/
