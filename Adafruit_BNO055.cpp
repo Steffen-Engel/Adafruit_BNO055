@@ -604,6 +604,22 @@ bool Adafruit_BNO055::isFullyCalibrated(void)
     return true;
 }
 
+void Adafruit_BNO055::AxisRemap(byte Config, byte Sign)
+{
+  adafruit_bno055_opmode_t lastMode = _mode;
+  setMode(OPERATION_MODE_CONFIG);
+  delay(25);
+
+  write8(BNO055_PAGE_ID_ADDR, 0);
+  delay(10);
+  write8(BNO055_AXIS_MAP_CONFIG_ADDR, Config);
+  delay(10);
+  write8(BNO055_AXIS_MAP_SIGN_ADDR, Sign);
+  delay(10);
+
+  setMode(lastMode);
+
+}
 
 /***************************************************************************
  PRIVATE FUNCTIONS
